@@ -1,6 +1,6 @@
 {
     "name": "solution25/maxmind",
-    "description": "MaxMind fraud prevention",
+    "description": "MaxMind fraud prevention plugin for Shopware 6",
     "type": "shopware-platform-plugin",
     "version": "1.2.0",
     "license": "MIT",
