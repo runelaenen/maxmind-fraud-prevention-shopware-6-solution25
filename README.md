@@ -28,14 +28,17 @@ The plugin helps store owners reduce fraud by automatically analyzing orders, fl
 
 1. **Download**
 
+## Git
+
 - Clone the Plugin Repository:
 - Open your terminal and run the following command in your Shopware 6 custom plugins directory (usually located at custom/plugins/):
   ```
   git clone https://github.com/solution25com/maxmind-fraud-prevention-shopware-6-solution25.git
   ```
-  You need install the project directory MaxMind/MinFraud Library by running following command:
-    ```
-  composer require maxmind/minfraud
+
+## Packagist
+ ```
+  composer require solution25/maxmind
   ```
 
 2. **Install the Plugin in Shopware 6**
@@ -149,9 +152,6 @@ The plugin helps store owners reduce fraud by automatically analyzing orders, fl
 - **Settings Not Saving**
   - Clear Shopware’s cache after saving.
   - Check file permissions if changes don’t persist.
-- **ClassNotFoundError: MaxMind\MinFraud Not Found in OrderPlacedSubscriber.php**
-  - You need to run **"composer require maxmind/minfraud"** 
-  - Make sure you're on the root when you use **"composer require maxmind/minfraud"** 
  
 ## FAQ
 - **Is a MaxMind account required?** 
