@@ -37,7 +37,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run Shopware Extension Verifier
-        uses: shopware/github-actions/extension-verifier@main
+        uses: shopware/github-actions/extension-verifier@0.1.4
         with:
           action: check
           check-against: ${{ matrix.version-selection }}
