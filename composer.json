@@ -12,19 +12,19 @@
         "shopware-plugin-class": "MaxMind\\MaxMind",
         "label": {
             "de-DE": "MaxMind Bestellbetrugserkennung",
-            "en-US": "MaxMind Order Fraud Detection"
+            "en-GB": "MaxMind Order Fraud Detection"
         },
         "description": {
             "de-DE": "MaxMind Integration für Betrugserkennung",
-            "en-US": "MaxMind integration for fraud detection"
+            "en-GB": "MaxMind integration for fraud detection"
         },
         "manufacturerLink": {
             "de-DE": "https://solution25.com/",
-            "en-US": "https://solution25.com/en/home_en/"
+            "en-GB": "https://solution25.com/en/home_en/"
         },
         "supportLink": {
             "de-DE": "https://solution25.com/",
-            "en-US": "https://solution25.com/en/home_en/"
+            "en-GB": "https://solution25.com/en/home_en/"
         }
     },
     "authors": [
