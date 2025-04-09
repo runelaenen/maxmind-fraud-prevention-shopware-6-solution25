@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MaxMind;
 
 use MaxMind\Service\CompleteStateInstaller;
 use MaxMind\Service\FraudFailStateInstaller;
 use MaxMind\Service\FraudPassStateInstaller;
+use MaxMind\Service\FraudReviewCustomFieldsInstaller;
+use MaxMind\Service\FraudReviewStateInstaller;
 use MaxMind\Service\InProgressStateInstaller;
 use MaxMind\Service\PendingFraudReviewStateInstaller;
-use Shopware\Core\Framework\Context;
+use MaxMind\Service\StateInstallerHelper;
 use Shopware\Core\Framework\Plugin;
 use Shopware\Core\Framework\Plugin\Context\ActivateContext;
-use Shopware\Core\Framework\Plugin\Context\DeactivateContext;
 use Shopware\Core\Framework\Plugin\Context\InstallContext;
 use Shopware\Core\Framework\Plugin\Context\UninstallContext;
 use Shopware\Core\Framework\Plugin\Context\UpdateContext;
-use MaxMind\Service\FraudReviewStateInstaller;
-use MaxMind\Service\FraudReviewCustomFieldsInstaller;
 
 class MaxMind extends Plugin
 {
+    private ?StateInstallerHelper $stateInstallerHelper = null;
+
     public function install(InstallContext $installContext): void
     {
         parent::install($installContext);
@@ -54,92 +56,109 @@ class MaxMind extends Plugin
         $this->getCustomFieldsInstaller()->addRelations($activateContext->getContext());
     }
 
-    private function getCustomFieldsInstaller(): object
+    private function getCustomFieldsInstaller(): FraudReviewCustomFieldsInstaller
     {
         if ($this->container->has(FraudReviewCustomFieldsInstaller::class)) {
-            return $this->container->get(FraudReviewCustomFieldsInstaller::class);
+            $installer = $this->container->get(FraudReviewCustomFieldsInstaller::class);
+            if ($installer instanceof FraudReviewCustomFieldsInstaller) {
+                return $installer;
+            }
         }
+
         return new FraudReviewCustomFieldsInstaller(
             $this->container->get('custom_field_set.repository'),
             $this->container->get('custom_field_set_relation.repository')
         );
     }
 
-    private function getOrderStateInstaller(): object
+    private function getOrderStateInstaller(): FraudReviewStateInstaller
     {
         if ($this->container->has(FraudReviewStateInstaller::class)) {
             return $this->container->get(FraudReviewStateInstaller::class);
         }
-        return new FraudReviewStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new FraudReviewStateInstaller($this->getStateInstallerHelper());
     }
 
-    private function getPendingOrderStateInstaller(): object
+    private function getPendingOrderStateInstaller(): PendingFraudReviewStateInstaller
     {
         if ($this->container->has(PendingFraudReviewStateInstaller::class)) {
-            return $this->container->get(PendingFraudReviewStateInstaller::class);
+            $installer = $this->container->get(PendingFraudReviewStateInstaller::class);
+            if ($installer instanceof PendingFraudReviewStateInstaller) {
+                return $installer;
+            }
         }
-        return new PendingFraudReviewStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new PendingFraudReviewStateInstaller($this->getStateInstallerHelper());
     }
 
-    private function getFraudPassOrderStateInstaller(): object
+    private function getFraudPassOrderStateInstaller(): FraudPassStateInstaller
     {
         if ($this->container->has(FraudPassStateInstaller::class)) {
-            return $this->container->get(FraudPassStateInstaller::class);
+            $installer = $this->container->get(FraudPassStateInstaller::class);
+            if ($installer instanceof FraudPassStateInstaller) {
+                return $installer;
+            }
         }
-        return new FraudPassStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new FraudPassStateInstaller($this->getStateInstallerHelper());
     }
 
-    private function getFraudFailOrderStateInstaller(): object
+    private function getFraudFailOrderStateInstaller(): FraudFailStateInstaller
     {
         if ($this->container->has(FraudFailStateInstaller::class)) {
-            return $this->container->get(FraudFailStateInstaller::class);
+            $installer = $this->container->get(FraudFailStateInstaller::class);
+            if ($installer instanceof FraudFailStateInstaller) {
+                return $installer;
+            }
         }
-        return new FraudFailStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new FraudFailStateInstaller($this->getStateInstallerHelper());
     }
 
-    private function getCompleteOrderStateInstaller(): object
+    private function getCompleteOrderStateInstaller(): CompleteStateInstaller
     {
         if ($this->container->has(CompleteStateInstaller::class)) {
-            return $this->container->get(CompleteStateInstaller::class);
+            $installer = $this->container->get(CompleteStateInstaller::class);
+            if ($installer instanceof CompleteStateInstaller) {
+                return $installer;
+            }
         }
-        return new CompleteStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new CompleteStateInstaller($this->getStateInstallerHelper());
     }
 
-    private function getInProgressStateInstaller(): object
+    private function getInProgressStateInstaller(): InProgressStateInstaller
     {
         if ($this->container->has(InProgressStateInstaller::class)) {
-            return $this->container->get(InProgressStateInstaller::class);
+            $installer = $this->container->get(InProgressStateInstaller::class);
+            if ($installer instanceof InProgressStateInstaller) {
+                return $installer;
+            }
         }
-        return new InProgressStateInstaller(
-            $this->container->get('state_machine.repository'),
-            $this->container->get('state_machine_state.repository'),
-            $this->container->get('state_machine_transition.repository'),
-            $this->container->get('state_machine_history.repository')
-        );
+
+        return new InProgressStateInstaller($this->getStateInstallerHelper());
+    }
+
+    private function getStateInstallerHelper(): StateInstallerHelper
+    {
+        if ($this->stateInstallerHelper instanceof StateInstallerHelper) {
+            return $this->stateInstallerHelper;
+        }
+
+        if ($this->container->has(StateInstallerHelper::class)) {
+            $this->stateInstallerHelper = $this->container->get(StateInstallerHelper::class);
+        }
+
+        if (!$this->stateInstallerHelper instanceof StateInstallerHelper) {
+            $this->stateInstallerHelper = new StateInstallerHelper(
+                $this->container->get('state_machine.repository'),
+                $this->container->get('state_machine_state.repository'),
+                $this->container->get('state_machine_transition.repository'),
+                $this->container->get('state_machine_history.repository'),
+            );
+        }
+
+        return $this->stateInstallerHelper;
     }
 }

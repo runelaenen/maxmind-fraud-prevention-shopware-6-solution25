@@ -79,14 +79,12 @@ class FraudReviewCustomFieldsInstaller
     public function addRelations(Context $context): void
     {
         try {
-            $this->customFieldSetRelationRepository->upsert(array_map(function (string $customFieldSetId) {
-                return [
-                    'customFieldSetId' => $customFieldSetId,
-                    'entityName' => 'product',
-                ];
-            }, $this->getCustomFieldSetIds($context)), $context);
+            $this->customFieldSetRelationRepository->upsert(array_map(fn(string $customFieldSetId) => [
+                'customFieldSetId' => $customFieldSetId,
+                'entityName' => 'product',
+            ], $this->getCustomFieldSetIds($context)), $context);
         }
-        catch (\Exception $e) {
+        catch (\Exception) {
             // do nothing
         }
     }
@@ -109,16 +107,12 @@ class FraudReviewCustomFieldsInstaller
 
         if (!empty($customFieldSetIds)) {
             $this->customFieldSetRelationRepository->delete(
-                array_map(function ($id) {
-                    return ['customFieldSetId' => $id];
-                }, $customFieldSetIds),
+                array_map(fn($id) => ['customFieldSetId' => $id], $customFieldSetIds),
                 $context
             );
 
             $this->customFieldSetRepository->delete(
-                array_map(function ($id) {
-                    return ['id' => $id];
-                }, $customFieldSetIds),
+                array_map(fn($id) => ['id' => $id], $customFieldSetIds),
                 $context
             );
         }

@@ -8,17 +8,14 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(defaults: ['_routeScope' => ['api']])]
+#[\Symfony\Component\Routing\Attribute\Route(defaults: ['_routeScope' => ['api']])]
 class OrderDetailController extends AbstractController
 {
-    private EntityRepository $orderRepository;
-
-    public function __construct(EntityRepository $orderRepository)
+    public function __construct(private readonly EntityRepository $orderRepository)
     {
-        $this->orderRepository = $orderRepository;
     }
 
-    #[Route('/api/_action/maxmind/fraud-details/{orderId}', name: 'api.action.maxmind.fraud_details', methods: ['GET'])]
+    #[\Symfony\Component\Routing\Attribute\Route('/api/_action/maxmind/fraud-details/{orderId}', name: 'api.action.maxmind.fraud_details', methods: ['GET'])]
     public function getFraudDetails(string $orderId, Context $context)
     {
         $criteria = new Criteria([$orderId]);

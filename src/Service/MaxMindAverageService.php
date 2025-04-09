@@ -1,29 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace MaxMind\Service;
 
+use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
-use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Psr\Log\LoggerInterface;
 
 class MaxMindAverageService
 {
-    private EntityRepository $orderRepository;
-    private SystemConfigService $systemConfigService;
-    private LoggerInterface $logger;
-
     public function __construct(
-        EntityRepository $orderRepository,
-        SystemConfigService $systemConfigService,
-        LoggerInterface $logger
+        private readonly EntityRepository $orderRepository,
+        private readonly SystemConfigService $systemConfigService,
+        private readonly LoggerInterface $logger
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->systemConfigService = $systemConfigService;
-        $this->logger = $logger;
     }
 
     public function getOverallRiskScore(Context $context, ?string $salesChannelId = null): float
@@ -34,7 +29,8 @@ class MaxMindAverageService
         $lastCalculationTime = $this->systemConfigService->get($lastCalculationTimeKey, $salesChannelId);
         $overallRiskScore = $this->systemConfigService->get($overallRiskScoreKey, $salesChannelId);
 
-        $this->logger->info("Retrieved from SystemConfigService - Last calculation time: " . ($lastCalculationTime ?? 'null') . ", Overall risk score: " . ($overallRiskScore ?? 'null'));
+        $this->logger->info("Retrieved from SystemConfigService - Last calculation time: " . ($lastCalculationTime ??
+                'null') . ", Overall risk score: " . ($overallRiskScore ?? 'null'));
 
         if ($lastCalculationTime && $overallRiskScore) {
             $currentTime = time();
@@ -44,6 +40,7 @@ class MaxMindAverageService
 
             if ($timeDifference < 10800) {
                 $this->logger->info("Using stored overall risk score: $overallRiskScore");
+
                 return (float)$overallRiskScore;
             } else {
                 $this->logger->info("Stored data is older than 3 hours, recalculating...");
@@ -73,11 +70,11 @@ class MaxMindAverageService
         $this->logger->info("Starting calculation of averages...");
 
         $criteria = new Criteria();
-        $criteria->addFilter(new \Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter(
-            \Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter::CONNECTION_AND,
+        $criteria->addFilter(new NotFilter(
+            NotFilter::CONNECTION_AND,
             [
-                new \Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter('customFields.maxmind_fraud_risk', null),
-                new \Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter('customFields.maxmind_ip_risk_score', null),
+                new EqualsFilter('customFields.maxmind_fraud_risk', null),
+                new EqualsFilter('customFields.maxmind_ip_risk_score', null),
             ]
         ));
 

@@ -1,49 +1,71 @@
 {% block sw_order_detail_general %}
     <sw-card v-if="hasMaxMindData">
-        <div class="sw-order-detail-general__maxmind-risk-scores">
-            <h3>{{ $tc('sw-order-detail-general.maxmindRiskScores.title') }}</h3>
-            <div class="sw-order-detail-general__maxmind-scores">
-                <div class="sw-order-detail-general__maxmind-score">
-                    <strong>{{ $tc('sw-order-detail-general.maxmindRiskScores.fraudRisk') }}</strong>
+        <div
+            class="sw-order-detail-general__maxmind-risk-scores"
+        >
+            <h3>
+                {{ $tc('sw-order-detail-general.maxmindRiskScores.title') }}
+            </h3>
+            <div
+                class="sw-order-detail-general__maxmind-scores"
+            >
+                <div
+                    class="sw-order-detail-general__maxmind-score"
+                >
+                    <strong>
+                        {{ $tc('sw-order-detail-general.maxmindRiskScores.fraudRisk') }}
+                    </strong>
                     <span>{{ fraudScore }}</span>
                 </div>
-                <div class="sw-order-detail-general__maxmind-score">
-                    <strong>{{ $tc('sw-order-detail-general.maxmindRiskScores.overallRiskScore') }}</strong>
+                <div
+                    class="sw-order-detail-general__maxmind-score"
+                >
+                    <strong>
+                        {{ $tc('sw-order-detail-general.maxmindRiskScores.overallRiskScore') }}
+                    </strong>
                     <span>{{ overallRiskScore }}</span>
                 </div>
-                <div class="sw-order-detail-general__maxmind-score">
-                    <strong>{{ $tc('sw-order-detail-general.maxmindRiskScores.ipRiskScore') }}</strong>
+                <div
+                    class="sw-order-detail-general__maxmind-score"
+                >
+                    <strong>
+                        {{ $tc('sw-order-detail-general.maxmindRiskScores.ipRiskScore') }}
+                    </strong>
                     <span>{{ ipRiskScore }}</span>
                 </div>
             </div>
-
-            <div class="sw-order-detail-general__maxmind-actions">
+            <div
+                class="sw-order-detail-general__maxmind-actions"
+            >
                 <a
-                        :href="transactionUrl"
-                        target="_blank"
-                        class="sw-button sw-button--primary"
+                    :href="transactionUrl"
+                    target="_blank"
+                    class="sw-button sw-button--primary"
                 >
                     {{ $tc('sw-order-detail-general.maxmindFraudDetection.viewInMaxMind') }}
                 </a>
                 <sw-button
-                        variant="ghost"
-                        @click="copyTransactionId"
+                    variant="ghost"
+                    @click="copyTransactionId"
                 >
                     {{ $tc('sw-order-detail-general.maxmindFraudDetection.copyTransactionId') }}
                 </sw-button>
                 <sw-button
-                        variant="ghost"
-                        @click="toggleWarningsFactors"
+                    variant="ghost"
+                    @click="toggleWarningsFactors"
                 >
                     {{ $tc('sw-order-detail-general.maxmindFraudDetection.viewWarningsFactors') }}
                 </sw-button>
             </div>
             <div
-                    v-if="showWarningsFactors"
-                    class="sw-order-detail-general__maxmind-warnings-factors"
+                v-if="showWarningsFactors"
+                class="sw-order-detail-general__maxmind-warnings-factors"
             >
                 <ul>
-                    <li v-for="factor in warningsFactors" :key="factor">
+                    <li
+                        v-for="factor in warningsFactors"
+                        :key="factor"
+                    >
                         {{ factor }}
                     </li>
                 </ul>
@@ -51,5 +73,5 @@
         </div>
     </sw-card>
 
-    {% parent %}
+    {% parent() %}
 {% endblock %}

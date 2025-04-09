@@ -17,24 +17,8 @@ use MaxMind\Service\MaxMindAverageService;
 
 class OrderPlacedSubscriber implements EventSubscriberInterface
 {
-    private EntityRepository $orderRepository;
-    private SystemConfigService $systemConfigService;
-    private LoggerInterface $logger;
-    private StateMachineRegistry $stateMachineRegistry;
-    private MaxMindAverageService $maxMindAverageService;
-
-    public function __construct(
-        EntityRepository $orderRepository,
-        SystemConfigService $systemConfigService,
-        LoggerInterface $logger,
-        StateMachineRegistry $stateMachineRegistry,
-        MaxMindAverageService $maxMindAverageService
-    ) {
-        $this->orderRepository = $orderRepository;
-        $this->systemConfigService = $systemConfigService;
-        $this->logger = $logger;
-        $this->stateMachineRegistry = $stateMachineRegistry;
-        $this->maxMindAverageService = $maxMindAverageService;
+    public function __construct(private readonly EntityRepository $orderRepository, private readonly SystemConfigService $systemConfigService, private readonly LoggerInterface $logger, private readonly StateMachineRegistry $stateMachineRegistry, private readonly MaxMindAverageService $maxMindAverageService)
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -124,7 +108,7 @@ class OrderPlacedSubscriber implements EventSubscriberInterface
     private function callMinFraudApi(OrderEntity $order, int $accountId, ?string $licenseKey, Context $context, ?string $salesChannelId): array
     {
         try {
-            $client = new \MaxMind\MinFraud($accountId, $licenseKey);
+            $client = new MinFraud($accountId, $licenseKey);
             $request = $client->withDevice(
                 ipAddress: $order->getOrderCustomer()?->getRemoteAddress() ?? '127.0.0.1',
                 sessionAge: 3600.5,
@@ -173,9 +157,7 @@ class OrderPlacedSubscriber implements EventSubscriberInterface
                 'maxmind_ip_risk_score' => $ipRiskScore,
                 'maxmind_transaction_id' => $response->id ?? '',
                 'maxmind_transaction_url' => sprintf('https://www.maxmind.com/en/accounts/%s/minfraud-interactive/transactions/%s', $accountId, $response->id ?? ''),
-                'maxmind_warnings_factors' => array_map(function ($warning) {
-                    return $warning->warning ?? '';
-                }, $response->warnings ?? []),
+                'maxmind_warnings_factors' => array_map(fn($warning) => $warning->warning ?? '', $response->warnings ?? []),
             ];
 
             $this->logger->info("MaxMind Insights Response for Order {$order->getId()}: " . json_encode($data));

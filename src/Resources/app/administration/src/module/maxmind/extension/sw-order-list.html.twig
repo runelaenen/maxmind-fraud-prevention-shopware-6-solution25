@@ -2,9 +2,9 @@
     <template #column-stateMachineState.name="{ item }">
         <div class="sw-order-list__state">
             <sw-color-badge
-                    :color="getVariantFromOrderState(item)"
-                    :class="getStatusBadgeClass(item.stateMachineState.technicalName)"
-                    rounded
+                :color="getVariantFromOrderState(item)"
+                :class="getStatusBadgeClass(item.stateMachineState.technicalName)"
+                rounded
             />
             {{ item.stateMachineState.translated.name }}
         </div>
