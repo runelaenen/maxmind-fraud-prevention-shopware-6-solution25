@@ -110,8 +110,10 @@ class StateInstallerHelper
 
         if (!empty($deleteIds)) {
             try {
-                $this->stateMachineTransitionRepository->delete(array_map(fn($id) => ['id' => $id], $deleteIds),
-                    $context);
+                $this->stateMachineTransitionRepository->delete(
+                    array_map(fn ($id) => ['id' => $id], $deleteIds),
+                    $context
+                );
             } catch (\Exception) {
             }
         }
@@ -140,9 +142,9 @@ class StateInstallerHelper
         ]));
         $historyDeleteIds = $this->stateMachineHistoryRepository->searchIds($historyCriteria, $context)->getIds();
 
-        $stateDeleteIds = array_map(fn($id) => ['id' => $id], $stateDeleteIds);
-        $transitionDeleteIds = array_map(fn($id) => ['id' => $id], $transitionDeleteIds);
-        $historyDeleteIds = array_map(fn($id) => ['id' => $id], $historyDeleteIds);
+        $stateDeleteIds = array_map(fn ($id) => ['id' => $id], $stateDeleteIds);
+        $transitionDeleteIds = array_map(fn ($id) => ['id' => $id], $transitionDeleteIds);
+        $historyDeleteIds = array_map(fn ($id) => ['id' => $id], $historyDeleteIds);
 
         // Perform batch deletions
         if (!empty($transitionDeleteIds)) {
@@ -182,15 +184,15 @@ class StateInstallerHelper
             $stateNames[$states['to']] = 1;
         }
 
-        if (array_key_exists($stateMachineId, $this->stateIds)) {
+        if (\array_key_exists($stateMachineId, $this->stateIds)) {
             foreach (array_keys($stateNames) as $stateName) {
-                if (array_key_exists($stateName, $this->stateIds[$stateMachineId])) {
+                if (\array_key_exists($stateName, $this->stateIds[$stateMachineId])) {
                     unset($stateNames[$stateName]);
                 }
             }
         }
 
-        if (count($stateNames) > 0) {
+        if (\count($stateNames) > 0) {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsAnyFilter('technicalName', array_keys($stateNames)));
             $criteria->addFilter(new EqualsFilter('stateMachineId', $stateMachineId));

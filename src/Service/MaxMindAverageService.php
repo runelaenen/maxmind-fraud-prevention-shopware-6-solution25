@@ -29,8 +29,8 @@ class MaxMindAverageService
         $lastCalculationTime = $this->systemConfigService->get($lastCalculationTimeKey, $salesChannelId);
         $overallRiskScore = $this->systemConfigService->get($overallRiskScoreKey, $salesChannelId);
 
-        $this->logger->info("Retrieved from SystemConfigService - Last calculation time: " . ($lastCalculationTime ??
-                'null') . ", Overall risk score: " . ($overallRiskScore ?? 'null'));
+        $this->logger->info('Retrieved from SystemConfigService - Last calculation time: ' . ($lastCalculationTime ??
+                'null') . ', Overall risk score: ' . ($overallRiskScore ?? 'null'));
 
         if ($lastCalculationTime && $overallRiskScore) {
             $currentTime = time();
@@ -41,12 +41,11 @@ class MaxMindAverageService
             if ($timeDifference < 10800) {
                 $this->logger->info("Using stored overall risk score: $overallRiskScore");
 
-                return (float)$overallRiskScore;
-            } else {
-                $this->logger->info("Stored data is older than 3 hours, recalculating...");
+                return (float) $overallRiskScore;
             }
+            $this->logger->info('Stored data is older than 3 hours, recalculating...');
         } else {
-            $this->logger->info("No valid data in SystemConfigService, proceeding to calculate...");
+            $this->logger->info('No valid data in SystemConfigService, proceeding to calculate...');
         }
 
         $averages = $this->calculateAverages($context);
@@ -67,7 +66,7 @@ class MaxMindAverageService
     public function calculateAverages(Context $context): array
     {
         $startTime = microtime(true);
-        $this->logger->info("Starting calculation of averages...");
+        $this->logger->info('Starting calculation of averages...');
 
         $criteria = new Criteria();
         $criteria->addFilter(new NotFilter(
@@ -89,15 +88,15 @@ class MaxMindAverageService
         foreach ($orders as $order) {
             $customFields = $order->getCustomFields() ?? [];
             if (isset($customFields['maxmind_fraud_risk'])) {
-                $fraudRiskScores[] = (float)$customFields['maxmind_fraud_risk'];
+                $fraudRiskScores[] = (float) $customFields['maxmind_fraud_risk'];
             }
             if (isset($customFields['maxmind_ip_risk_score'])) {
-                $ipRiskScores[] = (float)$customFields['maxmind_ip_risk_score'];
+                $ipRiskScores[] = (float) $customFields['maxmind_ip_risk_score'];
             }
         }
 
-        $fraudRiskAverage = !empty($fraudRiskScores) ? array_sum($fraudRiskScores) / count($fraudRiskScores) : 0.0;
-        $ipRiskAverage = !empty($ipRiskScores) ? array_sum($ipRiskScores) / count($ipRiskScores) : 0.0;
+        $fraudRiskAverage = !empty($fraudRiskScores) ? array_sum($fraudRiskScores) / \count($fraudRiskScores) : 0.0;
+        $ipRiskAverage = !empty($ipRiskScores) ? array_sum($ipRiskScores) / \count($ipRiskScores) : 0.0;
         $overallRiskAverage = ($fraudRiskAverage + $ipRiskAverage) / 2;
 
         $endTime = microtime(true);

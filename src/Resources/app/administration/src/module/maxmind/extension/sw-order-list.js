@@ -43,6 +43,6 @@ Shopware.Component.override('sw-order-list', {
                 default:
                     return 'neutral';
             }
-        }
-    }
+        },
+    },
 });

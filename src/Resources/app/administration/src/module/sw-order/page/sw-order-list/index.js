@@ -17,10 +17,10 @@ Component.override('sw-order-list', {
                     return fraudScore !== null && fraudScore !== undefined
                         ? parseFloat(fraudScore)
                         : '-';
-                }
+                },
             });
 
             return columns;
-        }
-    }
+        },
+    },
 });

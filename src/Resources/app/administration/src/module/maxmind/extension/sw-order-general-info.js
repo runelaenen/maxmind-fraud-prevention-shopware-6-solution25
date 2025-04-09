@@ -24,6 +24,6 @@ Shopware.Component.override('sw-order-general-info', {
                 default:
                     return 'sw-order-state__open-select';
             }
-        }
-    }
+        },
+    },
 });

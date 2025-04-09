@@ -19,21 +19,21 @@ class FraudReviewCustomFieldsInstaller
             'label' => [
                 'en-GB' => 'Fraud Review',
                 'de-DE' => 'Betrugsüberprüfung',
-                Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here'
-            ]
+                Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here',
+            ],
         ],
         'customFields' => [
-             [
+            [
                 'name' => 'maxmind_fraud_risk',
                 'type' => CustomFieldTypes::FLOAT,
                 'config' => [
                     'label' => [
                         'en-GB' => 'Is product preorder',
                         'de-DE' => 'Ist das Produkt vorbestellbar',
-                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here'
+                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here',
                     ],
-                    'customFieldPosition' => 1
-                ]
+                    'customFieldPosition' => 1,
+                ],
             ],
             [
                 'name' => 'maxmind_fraud_score',
@@ -42,10 +42,10 @@ class FraudReviewCustomFieldsInstaller
                     'label' => [
                         'en-GB' => 'Is product preorder',
                         'de-DE' => 'Ist das Produkt vorbestellbar',
-                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here'
+                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here',
                     ],
-                    'customFieldPosition' => 2
-                ]
+                    'customFieldPosition' => 2,
+                ],
             ],
             [
                 'name' => 'maxmind_fraud_details',
@@ -54,38 +54,55 @@ class FraudReviewCustomFieldsInstaller
                     'label' => [
                         'en-GB' => 'Is product preorder',
                         'de-DE' => 'Ist das Produkt vorbestellbar',
-                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here'
+                        Defaults::LANGUAGE_SYSTEM => 'Mention the fallback label here',
                     ],
-                    'customFieldPosition' => 3
-                ]
-            ]
-        ]
+                    'customFieldPosition' => 3,
+                ],
+            ],
+        ],
     ];
 
     public function __construct(
         private readonly EntityRepository $customFieldSetRepository,
         private readonly EntityRepository $customFieldSetRelationRepository
-    )
-    {
+    ) {
     }
 
     public function install(Context $context): void
     {
         $this->customFieldSetRepository->upsert([
-            self::CUSTOM_FIELDSET
+            self::CUSTOM_FIELDSET,
         ], $context);
     }
 
     public function addRelations(Context $context): void
     {
         try {
-            $this->customFieldSetRelationRepository->upsert(array_map(fn(string $customFieldSetId) => [
+            $this->customFieldSetRelationRepository->upsert(array_map(fn (string $customFieldSetId) => [
                 'customFieldSetId' => $customFieldSetId,
                 'entityName' => 'product',
             ], $this->getCustomFieldSetIds($context)), $context);
-        }
-        catch (\Exception) {
+        } catch (\Exception) {
             // do nothing
+        }
+    }
+
+    public function remove(Context $context): void
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', self::CUSTOM_FIELDSET_NAME));
+        $customFieldSetIds = $this->customFieldSetRepository->searchIds($criteria, $context)->getIds();
+
+        if (!empty($customFieldSetIds)) {
+            $this->customFieldSetRelationRepository->delete(
+                array_map(fn ($id) => ['customFieldSetId' => $id], $customFieldSetIds),
+                $context
+            );
+
+            $this->customFieldSetRepository->delete(
+                array_map(fn ($id) => ['id' => $id], $customFieldSetIds),
+                $context
+            );
         }
     }
 
@@ -98,23 +115,5 @@ class FraudReviewCustomFieldsInstaller
         $criteria->addFilter(new EqualsFilter('name', self::CUSTOM_FIELDSET_NAME));
 
         return $this->customFieldSetRepository->searchIds($criteria, $context)->getIds();
-    }
-    public function remove(Context $context): void
-    {
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('name', self::CUSTOM_FIELDSET_NAME));
-        $customFieldSetIds = $this->customFieldSetRepository->searchIds($criteria, $context)->getIds();
-
-        if (!empty($customFieldSetIds)) {
-            $this->customFieldSetRelationRepository->delete(
-                array_map(fn($id) => ['customFieldSetId' => $id], $customFieldSetIds),
-                $context
-            );
-
-            $this->customFieldSetRepository->delete(
-                array_map(fn($id) => ['id' => $id], $customFieldSetIds),
-                $context
-            );
-        }
     }
 }
